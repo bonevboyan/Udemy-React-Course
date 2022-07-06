@@ -1,5 +1,7 @@
 import useInput from "../../hooks/use-input";
 
+import useHttp from "../../hooks/use-http"
+
 import classes from "./Checkout.module.css";
 
 const Checkout = (props) => {
@@ -41,11 +43,19 @@ const Checkout = (props) => {
         reset: cityReset,
     } = useInput(checkValidity);
 
+    const isFormValid =
+        nameIsValid && cityIsValid && postalCodeIsValid && streetIsValid;
+
     const confirmHandler = (event) => {
         event.preventDefault();
+        
+        props.onConfirm({
+            name: enteredName,
+            street: enteredStreet,
+            postalCode: enteredPostalCode,
+            city: enteredCity,
+        });
     };
-
-	const isFormValid = nameIsValid && cityIsValid && postalCodeIsValid && streetIsValid;
 
     return (
         <form className={classes.form} onSubmit={confirmHandler}>
@@ -66,8 +76,14 @@ const Checkout = (props) => {
             </div>
             <div className={classes.control}>
                 <label htmlFor="street">Street</label>
-                <input type="text" id="street" />
-                {nameError && (
+                <input
+                    type="text"
+                    id="street"
+                    onBlur={streetBlurHandler}
+                    onChange={streetChangeHandler}
+                    value={enteredStreet}
+                />
+                {streetError && (
                     <p className={classes["error-text"]}>
                         Street field should not be empty.
                     </p>
@@ -75,8 +91,14 @@ const Checkout = (props) => {
             </div>
             <div className={classes.control}>
                 <label htmlFor="postal">Postal Code</label>
-                <input type="text" id="postal" />
-                {nameError && (
+                <input 
+                    type="text"
+                    id="postal"
+                    onBlur={postalCodeBlurHandler}
+                    onChange={postalCodeChangeHandler}
+                    value={enteredPostalCode}
+                     />
+                {postalCodeError && (
                     <p className={classes["error-text"]}>
                         Postal Code field should not be empty.
                     </p>
@@ -84,8 +106,13 @@ const Checkout = (props) => {
             </div>
             <div className={classes.control}>
                 <label htmlFor="city">City</label>
-                <input type="text" id="city" />
-                {nameError && (
+                <input 
+                    type="text"
+                    id="city"
+                    onBlur={cityBlurHandler}
+                    onChange={cityChangeHandler}
+                    value={enteredCity} />
+                {cityError && (
                     <p className={classes["error-text"]}>
                         City field should not be empty.
                     </p>
@@ -95,7 +122,9 @@ const Checkout = (props) => {
                 <button type="button" onClick={props.onCancel}>
                     Cancel
                 </button>
-                <button className={classes.submit} disabled={!isFormValid}>Confirm</button>
+                <button className={classes.submit} disabled={!isFormValid}>
+                    Confirm
+                </button>
             </div>
         </form>
     );
