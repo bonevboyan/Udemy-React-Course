@@ -1,4 +1,5 @@
-import { cartActions } from "./cart";
+import { uiActions } from "./ui-slice";
+import { cartActions } from "./cart-slice";
 
 export const fetchCartData = () => {
     return async (dispatch) => {
@@ -7,7 +8,7 @@ export const fetchCartData = () => {
                 "https://react-http-demo-ad927-default-rtdb.europe-west1.firebasedatabase.app/cart.json"
             );
 
-            if(!response.ok){
+            if (!response.ok) {
                 throw new Error("Could not fetch cart data!");
             }
 
@@ -18,23 +19,28 @@ export const fetchCartData = () => {
 
         try {
             const cartData = await fetchData();
-
-            
+            dispatch(
+                cartActions.replaceCart({
+                    items: cartData.items || [],
+                    totalQuantity: cartData.totalQuantity,
+                })
+            );
         } catch (error) {
-            cartActions.showNotification({
-                status: "error",
-                title: "Error!",
-                message: "Fetching cart data failed!",
-            })
+            dispatch(
+                uiActions.showNotification({
+                    status: "error",
+                    title: "Error!",
+                    message: "Fetching cart data failed!",
+                })
+            );
         }
-
     };
 };
 
 export const sendCartData = (cart) => {
     return async (dispatch) => {
         dispatch(
-            cartActions.showNotification({
+            uiActions.showNotification({
                 status: "pending",
                 title: "Sending...",
                 message: "Sending cart data!",
@@ -46,7 +52,10 @@ export const sendCartData = (cart) => {
                 "https://react-http-demo-ad927-default-rtdb.europe-west1.firebasedatabase.app/cart.json",
                 {
                     method: "PUT",
-                    body: JSON.stringify(cart),
+                    body: JSON.stringify({
+                        items: cart.items,
+                        totalQuantity: cart.totalQuantity,
+                    }),
                 }
             );
 
@@ -59,7 +68,7 @@ export const sendCartData = (cart) => {
             await sendRequest();
 
             dispatch(
-                cartActions.showNotification({
+                uiActions.showNotification({
                     status: "success",
                     title: "Success!",
                     message: "Sent cart data successfully!",
@@ -67,7 +76,7 @@ export const sendCartData = (cart) => {
             );
         } catch (error) {
             dispatch(
-                cartActions.showNotification({
+                uiActions.showNotification({
                     status: "error",
                     title: "Error!",
                     message: "Sending cart data failed!",
