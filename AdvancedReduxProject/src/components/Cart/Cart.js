@@ -12,7 +12,7 @@ const Cart = (props) => {
     let itemsJsx = <p>Cart is empty.</p>;
 
     if (cartItems.length !== 0) {
-        itemsJsx = cartItems.map((item) => <CartItem item={item} />);
+        itemsJsx = cartItems.map((item) => <CartItem key={item.id} item={item} />);
     }
 
     return (
